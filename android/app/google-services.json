@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "918290790058",
+    "firebase_url": "https://flutter-intercom-145f6.firebaseio.com",
+    "project_id": "flutter-intercom-145f6",
+    "storage_bucket": "flutter-intercom-145f6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:918290790058:android:a98df9a2d1b82b2fd7c2d3",
+        "android_client_info": {
+          "package_name": "com.ahmadragab.flutterIntercom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "918290790058-17q9d5u6hr0e1qd56l8bn5emh5sou3q4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ahmadragab.flutterIntercom",
+            "certificate_hash": "ebdc1d63459e99e63344d9a572242c97c6743c77"
+          }
+        },
+        {
+          "client_id": "918290790058-pjbhpqkhclens7tgdpfgeinrj6b7hbo2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1UOQDWRpgUPA7t6-XI8dlgIsHBzW4as8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "918290790058-pjbhpqkhclens7tgdpfgeinrj6b7hbo2.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "918290790058-6eeceane3pkju93llf9f7rsg0epauk2v.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ahmadragab.flutterIntercom"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
