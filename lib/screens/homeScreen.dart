@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
         appBar: AppBar(
           title: Text((!kIsWeb)
               ? "Welcome, " + firebaseUser.displayName
-              : "Welcome" + webFirebaseUser.displayName),
+              : "Welcome" + firebaseUser.displayName),
           actions: <Widget>[
             RaisedButton(
               child: Text("Log out"),

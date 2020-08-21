@@ -15,7 +15,7 @@ class FlutterIntercomApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
         backgroundColor: Colors.blue,
-        accentColor: Colors.blue[900],
+        accentColor: Colors.blue,
         accentColorBrightness: Brightness.dark,
         buttonTheme: ButtonTheme.of(context).copyWith(
           buttonColor: Colors.blue,

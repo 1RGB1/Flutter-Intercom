@@ -24,7 +24,10 @@ class _SplachScreenState extends State<SplachScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(
+          'Intercom',
+          style: TextStyle(fontSize: 35),
+        ),
       ),
       body: Center(
         child: Column(

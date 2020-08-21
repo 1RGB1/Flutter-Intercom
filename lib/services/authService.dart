@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart' as MobFirebaseAuth;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../screens/splashScreen.dart';
@@ -42,23 +41,23 @@ class AuthService {
 
   //Checks if the user has signed in
   Future<bool> checkIsSignedIn() async {
-    if (!kIsWeb) {
-      //For mobile
-      if (mobAuth != null && (await mobGoogleSignIn.isSignedIn())) {
-        firebaseUser = mobAuth.currentUser;
-        blIsSignedIn = (firebaseUser != null) ? true : false;
-      } else {
-        blIsSignedIn = false;
-      }
+    // if (!kIsWeb) {
+    //For mobile
+    if (mobAuth != null && (await mobGoogleSignIn.isSignedIn())) {
+      firebaseUser = mobAuth.currentUser;
+      blIsSignedIn = (firebaseUser != null) ? true : false;
     } else {
-      //For web
-      if (webAuth != null) {
-        webFirebaseUser = await webAuth.onAuthStateChanged.first;
-        blIsSignedIn = (webFirebaseUser != null) ? true : false;
-      } else {
-        blIsSignedIn = false;
-      }
+      blIsSignedIn = false;
     }
+    // } else {
+    //   //For web
+    //   if (webAuth != null) {
+    //     webFirebaseUser = await webAuth.onAuthStateChanged.first;
+    //     blIsSignedIn = (webFirebaseUser != null) ? true : false;
+    //   } else {
+    //     blIsSignedIn = false;
+    //   }
+    // }
     return blIsSignedIn;
   }
 
@@ -156,65 +155,65 @@ class AuthService {
 
   //Gets the userData
   getData() async {
-    if (!kIsWeb) {
-      //For mobile
-      dbFirestore
-          .collection("Master")
-          .doc(firebaseUser.email)
-          .snapshots()
-          .listen((snapshot) {
-        if (snapshot.data() != null) {
-          userProfile = snapshot.data();
-        }
-      });
-    } else {
-      //For Web
-      webFirestore
-          .collection("Master")
-          .doc(webFirebaseUser.email)
-          .onSnapshot
-          .listen((snapshot) {
-        if (snapshot.data != null) {
-          userProfile = snapshot.data();
-        }
-      });
-    }
+    // if (!kIsWeb) {
+    //For mobile
+    dbFirestore
+        .collection("Master")
+        .doc(firebaseUser.email)
+        .snapshots()
+        .listen((snapshot) {
+      if (snapshot.data() != null) {
+        userProfile = snapshot.data();
+      }
+    });
+    // } else {
+    //   //For Web
+    //   webFirestore
+    //       .collection("Master")
+    //       .doc(webFirebaseUser.email)
+    //       .onSnapshot
+    //       .listen((snapshot) {
+    //     if (snapshot.data != null) {
+    //       userProfile = snapshot.data();
+    //     }
+    //   });
+    // }
   }
 
   //Update the data into the database
   Future<bool> setData() async {
     bool blReturn = false;
-    if (!kIsWeb) {
-      //For mobile
-      await dbFirestore
-          .collection('Master')
-          .doc(firebaseUser.email)
-          .set(userProfile)
-          .then((onValue) async {
-        blReturn = true;
-      });
-    } else {
-      //For Web
-      await webFirestore
-          .collection('Master')
-          .doc(webFirebaseUser.email)
-          .set(userProfile)
-          .then((onValue) async {
-        blReturn = true;
-      });
-    }
+    // if (!kIsWeb) {
+    //For mobile
+    await dbFirestore
+        .collection('Master')
+        .doc(firebaseUser.email)
+        .set(userProfile)
+        .then((onValue) async {
+      blReturn = true;
+    });
+    // } else {
+    //   //For Web
+    //   await webFirestore
+    //       .collection('Master')
+    //       .doc(webFirebaseUser.email)
+    //       .set(userProfile)
+    //       .then((onValue) async {
+    //     blReturn = true;
+    //   });
+    // }
     return blReturn;
   }
 
   //Signout using normal method
   void signOut() async {
-    if (!kIsWeb) {
-      //For mobile
-      mobAuth.signOut();
-    } else {
-      //For web
-      webAuth.signOut();
-    }
+    // if (!kIsWeb) {
+    //For mobile
+    mobAuth.signOut();
+    // } else {
+    //   //For web
+    //   webAuth.signOut();
+    // }
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('auth', false);

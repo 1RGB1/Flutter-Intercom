@@ -20,27 +20,69 @@ class _LoginAndRegisterationScreenState
   var _userEmail = '';
   var _userPassword = '';
 
-  // void _trySubmit() {
-  //   final isValid = _formKey.currentState.validate();
-  //   FocusScope.of(context).unfocus();
+  String _validateEmail(String value) {
+    value = value.trim();
 
-  //   if (isValid) {
-  //     _formKey.currentState.save();
-  //     widget.submitFn(
-  //       _userEmail.trim(),
-  //       _userName.trim(),
-  //       _userPassword.trim(),
-  //       _isLogin,
-  //       context,
-  //     );
-  //   }
-  // }
+    if (value.isEmpty) {
+      return 'Email can\'t be empty';
+    } else if (!value.contains(RegExp(
+        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+"))) {
+      return 'Enter a correct email address';
+    }
 
+    return null;
+  }
+
+  String _validatePassword(String value) {
+    value = value.trim();
+
+    String compinedReg =
+        r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[_!@#\$%\^&\*])(?=.{6,})';
+    String smallReg = r'^(?=.*[a-z])';
+    String capitalReg = r'^(?=.*[A-Z])';
+    String charReg = r'^(?=.*[_!@#\$%\^&\*])';
+    String numberReg = r'^(?=.*[0-9])';
+
+    if (value.isEmpty) {
+      return 'Password can\'t be empty';
+    } else if (!value.contains(RegExp(compinedReg))) {
+      String resultError = 'Enter a correct password:';
+
+      if (!value.contains(RegExp(smallReg))) {
+        resultError += '\n' + 'Atleat 1 small letter';
+      }
+
+      if (!value.contains(RegExp(capitalReg))) {
+        resultError += '\n' + 'Atleat 1 capital letter';
+      }
+
+      if (!value.contains(RegExp(charReg))) {
+        resultError += '\n' + 'Atleat 1 character';
+      }
+
+      if (!value.contains(RegExp(numberReg))) {
+        resultError += '\n' + 'Atleat 1 number';
+      }
+
+      if (value.length < 6) {
+        resultError += '\n' + 'Not less than 6 characters';
+      }
+
+      return resultError;
+    }
+
+    return null;
+  }
+
+  bool _clearToAuth() {
+    FocusScope.of(context).unfocus();
+    return _formKey.currentState.validate();
+  }
+
+  //LOGIN USING GOOGLE HERE
   void _googleSignIn() {
-    //LOGIN USING GOOGLE HERE
     authService.googleMethodAuth().then((user) {
       if (user == null) {
-        //Login failed
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -60,10 +102,11 @@ class _LoginAndRegisterationScreenState
     });
   }
 
+  //LOGIN USING EMAIL HERE
   void _normalSignIn() {
-    //LOGIN USING EMAIL HERE
     authService
-        .normalMethodAuthWithEmail(_userEmail, _userPassword, _isLogin)
+        .normalMethodAuthWithEmail(
+            _userEmail.trim(), _userPassword.trim(), _isLogin)
         .then((user) {
       if (user == null) {
         showDialog(
@@ -89,90 +132,116 @@ class _LoginAndRegisterationScreenState
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text(_isLogin ? 'Login' : 'Register'),
+          title: Text(
+            'Intercom',
+            style: TextStyle(fontSize: 35),
+          ),
         ),
         body: Center(
-          child: Card(
-            margin: EdgeInsets.all(20),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: EdgeInsets.all(16),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      TextFormField(
-                        key: ValueKey('email'),
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          labelText: 'Email address',
-                        ),
-                        validator: (value) {
-                          return (value.isEmpty || !value.contains('@'))
-                              ? 'Please enter valid email'
-                              : null;
-                        },
-                        onSaved: (value) {
-                          _userEmail = value;
-                        },
-                      ),
-                      TextFormField(
-                        key: ValueKey('password'),
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          labelText: 'Password',
-                        ),
-                        validator: (value) {
-                          return (value.isEmpty || value.length < 6)
-                              ? 'Password must be atleast 6 characters long'
-                              : null;
-                        },
-                        onSaved: (value) {
-                          _userPassword = value;
-                        },
-                      ),
-                      SizedBox(
-                        height: 12,
-                      ),
-                      RaisedButton(
-                        child: Text(_isLogin ? 'Login' : 'Signup'),
-                        onPressed: _normalSignIn,
-                      ),
-                      RaisedButton(
-                        child: Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
+          child: Container(
+            width: 500,
+            child: Center(
+              child: Card(
+                margin: EdgeInsets.all(20),
+                child: SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          TextFormField(
+                            key: ValueKey('email'),
+                            keyboardType: TextInputType.emailAddress,
+                            decoration: InputDecoration(
+                              labelText: 'Email address',
+                              hintText: 'example@example.example',
+                            ),
+                            validator: (value) {
+                              return _validateEmail(value);
+                            },
+                            onSaved: (value) {
+                              _userEmail = value;
+                            },
+                            onChanged: (value) {
+                              _userEmail = value;
+                            },
+                          ),
+                          TextFormField(
+                            key: ValueKey('password'),
+                            obscureText: true,
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              suffixIcon: Icon(Icons.lock),
+                            ),
+                            validator: (value) {
+                              return _validatePassword(value);
+                            },
+                            onSaved: (value) {
+                              _userPassword = value;
+                            },
+                            onChanged: (value) {
+                              _userPassword = value;
+                            },
+                          ),
+                          SizedBox(
+                            height: 12,
+                          ),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image(
-                                image: AssetImage('assets/google_logo.png'),
-                                height: 25,
+                            children: <Widget>[
+                              RaisedButton(
+                                color: Theme.of(context).accentColor,
+                                shape: Theme.of(context).buttonTheme.shape,
+                                child: Text('Login'),
+                                onPressed: () {
+                                  if (_clearToAuth()) {
+                                    _isLogin = true;
+                                    _normalSignIn();
+                                  }
+                                },
                               ),
                               SizedBox(
-                                width: 5,
+                                width: 20,
                               ),
-                              Text(_isLogin
-                                  ? 'Login in using google account'
-                                  : 'Signup in using google account'),
+                              RaisedButton(
+                                color: Theme.of(context).accentColor,
+                                shape: Theme.of(context).buttonTheme.shape,
+                                child: Text('Signup'),
+                                onPressed: () {
+                                  if (_clearToAuth()) {
+                                    _isLogin = false;
+                                    _normalSignIn();
+                                  }
+                                },
+                              ),
                             ],
                           ),
-                        ),
-                        onPressed: _googleSignIn,
+                          RaisedButton(
+                            shape: Theme.of(context).buttonTheme.shape,
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image(
+                                    image: AssetImage('assets/google_logo.png'),
+                                    height: 25,
+                                  ),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text('Use google account'),
+                                ],
+                              ),
+                            ),
+                            onPressed: _googleSignIn,
+                          ),
+                        ],
                       ),
-                      FlatButton(
-                        child: Text(_isLogin
-                            ? 'Create new account'
-                            : 'I already have an account'),
-                        textColor: Theme.of(context).primaryColor,
-                        onPressed: () {
-                          setState(() {
-                            _isLogin = !_isLogin;
-                          });
-                        },
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
