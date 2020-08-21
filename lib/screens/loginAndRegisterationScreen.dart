@@ -19,6 +19,7 @@ class _LoginAndRegisterationScreenState
   var _isLogin = true;
   var _userEmail = '';
   var _userPassword = '';
+  var _obscureText = true;
 
   String _validateEmail(String value) {
     value = value.trim();
@@ -72,6 +73,12 @@ class _LoginAndRegisterationScreenState
     }
 
     return null;
+  }
+
+  void _togglePassword() {
+    setState(() {
+      _obscureText = !_obscureText;
+    });
   }
 
   bool _clearToAuth() {
@@ -170,10 +177,23 @@ class _LoginAndRegisterationScreenState
                           ),
                           TextFormField(
                             key: ValueKey('password'),
-                            obscureText: true,
+                            obscureText: _obscureText,
                             decoration: InputDecoration(
                               labelText: 'Password',
-                              suffixIcon: Icon(Icons.lock),
+                              suffixIcon: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  IconButton(
+                                    icon: Icon(!_obscureText
+                                        ? Icons.visibility
+                                        : Icons.visibility_off),
+                                    onPressed: _togglePassword,
+                                  ),
+                                  Icon(Icons.lock),
+                                ],
+                              ),
                             ),
                             validator: (value) {
                               return _validatePassword(value);

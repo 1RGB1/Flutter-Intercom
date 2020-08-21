@@ -1,12 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import 'splashScreen.dart';
 import 'loginAndRegisterationScreen.dart';
 import '../services/authService.dart';
-//==================This is the Homepage for the app==================
-
-String strAppBarTitle = "Healthstation Foundation";
+//==================This is the Homepage for the app==================s
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -34,26 +31,49 @@ class _HomeScreenState extends State<HomeScreen> {
       color: Colors.white,
       home: Scaffold(
         appBar: AppBar(
-          title: Text((!kIsWeb)
-              ? "Welcome, " + firebaseUser.displayName
-              : "Welcome" + firebaseUser.displayName),
-          actions: <Widget>[
-            RaisedButton(
-              child: Text("Log out"),
-              onPressed: () {
-                authService.signOut();
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => LoginAndRegisterationScreen()));
-              },
-            )
-          ],
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              FlatButton(
+                child: Text(
+                  'Log out',
+                  style: TextStyle(
+                    color: Colors.white,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+                onPressed: () {
+                  authService.signOut();
+                  Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => LoginAndRegisterationScreen()));
+                },
+              ),
+              Text(
+                'Welcome, ',
+              ),
+              Text(
+                (firebaseUser.displayName != null)
+                    ? firebaseUser.displayName
+                    : firebaseUser.email,
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(
+                width: 25,
+              ),
+            ],
+          ),
         ),
 
         //FAB
         floatingActionButton: FloatingActionButton.extended(
-            label: Text("Add data"),
+            label: Text('Add data'),
             onPressed: () {
               //Add data to the map
               userProfile[userProfile.length.toString()] =
@@ -77,7 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
               height: 50,
               child: RaisedButton(
                 child: new Text(
-                  "Clear",
+                  'Clear',
                   style: TextStyle(fontSize: 19),
                 ),
                 onPressed: () {
@@ -90,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             userProfile == null
-                ? Center(child: Text("No Data"))
+                ? Center(child: Text('No Data'))
                 : Container(
                     height: MediaQuery.of(context).size.height - 150,
                     child: ListView.builder(
