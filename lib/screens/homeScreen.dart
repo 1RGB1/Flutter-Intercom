@@ -53,20 +53,20 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               Text(
-                'Welcome, ',
+                'Welcome',
               ),
-              Text(
-                (firebaseUser.displayName != null)
-                    ? firebaseUser.displayName
-                    : firebaseUser.email,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(
-                width: 25,
-              ),
+              // Text(
+              //   'Welcome, ',
+              // ),
+              // Text(
+              //   (firebaseUser.displayName != null)
+              //       ? firebaseUser.displayName
+              //       : firebaseUser.email,
+              //   style: TextStyle(
+              //     color: Colors.black,
+              //     fontWeight: FontWeight.bold,
+              //   ),
+              // ),
             ],
           ),
         ),

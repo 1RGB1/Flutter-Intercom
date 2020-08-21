@@ -1,12 +1,14 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import './screens/splashScreen.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(FlutterIntercomApp());
 }
 
 class FlutterIntercomApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 import 'splashScreen.dart';
 import 'homeScreen.dart';
@@ -20,6 +21,7 @@ class _LoginAndRegisterationScreenState
   var _userEmail = '';
   var _userPassword = '';
   var _obscureText = true;
+  var _isAPIDone = true;
 
   String _validateEmail(String value) {
     value = value.trim();
@@ -111,10 +113,18 @@ class _LoginAndRegisterationScreenState
 
   //LOGIN USING EMAIL HERE
   void _normalSignIn() {
+    setState(() {
+      _isAPIDone = false;
+    });
+
     authService
         .normalMethodAuthWithEmail(
             _userEmail.trim(), _userPassword.trim(), _isLogin)
-        .then((user) {
+        .whenComplete(() {
+      setState(() {
+        _isAPIDone = true;
+      });
+    }).then((user) {
       if (user == null) {
         showDialog(
             context: context,
@@ -145,128 +155,134 @@ class _LoginAndRegisterationScreenState
           ),
         ),
         body: Center(
-          child: Container(
-            width: 500,
-            child: Center(
-              child: Card(
-                margin: EdgeInsets.all(20),
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.all(16),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          TextFormField(
-                            key: ValueKey('email'),
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              labelText: 'Email address',
-                              hintText: 'example@example.example',
-                            ),
-                            validator: (value) {
-                              return _validateEmail(value);
-                            },
-                            onSaved: (value) {
-                              _userEmail = value;
-                            },
-                            onChanged: (value) {
-                              _userEmail = value;
-                            },
-                          ),
-                          TextFormField(
-                            key: ValueKey('password'),
-                            obscureText: _obscureText,
-                            decoration: InputDecoration(
-                              labelText: 'Password',
-                              suffixIcon: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  IconButton(
-                                    icon: Icon(!_obscureText
-                                        ? Icons.visibility
-                                        : Icons.visibility_off),
-                                    onPressed: _togglePassword,
+          child: !_isAPIDone
+              ? SpinKitChasingDots(color: Colors.blue, size: 50.0)
+              : Container(
+                  width: 500,
+                  child: Center(
+                    child: Card(
+                      margin: EdgeInsets.all(20),
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                TextFormField(
+                                  key: ValueKey('email'),
+                                  keyboardType: TextInputType.emailAddress,
+                                  decoration: InputDecoration(
+                                    labelText: 'Email address',
+                                    hintText: 'example@example.example',
                                   ),
-                                  Icon(Icons.lock),
-                                ],
-                              ),
-                            ),
-                            validator: (value) {
-                              return _validatePassword(value);
-                            },
-                            onSaved: (value) {
-                              _userPassword = value;
-                            },
-                            onChanged: (value) {
-                              _userPassword = value;
-                            },
-                          ),
-                          SizedBox(
-                            height: 12,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              RaisedButton(
-                                color: Theme.of(context).accentColor,
-                                shape: Theme.of(context).buttonTheme.shape,
-                                child: Text('Login'),
-                                onPressed: () {
-                                  if (_clearToAuth()) {
-                                    _isLogin = true;
-                                    _normalSignIn();
-                                  }
-                                },
-                              ),
-                              SizedBox(
-                                width: 20,
-                              ),
-                              RaisedButton(
-                                color: Theme.of(context).accentColor,
-                                shape: Theme.of(context).buttonTheme.shape,
-                                child: Text('Signup'),
-                                onPressed: () {
-                                  if (_clearToAuth()) {
-                                    _isLogin = false;
-                                    _normalSignIn();
-                                  }
-                                },
-                              ),
-                            ],
-                          ),
-                          RaisedButton(
-                            shape: Theme.of(context).buttonTheme.shape,
-                            child: Padding(
-                              padding: const EdgeInsets.all(5.0),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Image(
-                                    image: AssetImage('assets/google_logo.png'),
-                                    height: 25,
+                                  validator: (value) {
+                                    return _validateEmail(value);
+                                  },
+                                  onSaved: (value) {
+                                    _userEmail = value;
+                                  },
+                                  onChanged: (value) {
+                                    _userEmail = value;
+                                  },
+                                ),
+                                TextFormField(
+                                  key: ValueKey('password'),
+                                  obscureText: _obscureText,
+                                  decoration: InputDecoration(
+                                    labelText: 'Password',
+                                    suffixIcon: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: <Widget>[
+                                        IconButton(
+                                          icon: Icon(!_obscureText
+                                              ? Icons.visibility
+                                              : Icons.visibility_off),
+                                          onPressed: _togglePassword,
+                                        ),
+                                        Icon(Icons.lock),
+                                      ],
+                                    ),
                                   ),
-                                  SizedBox(
-                                    width: 5,
+                                  validator: (value) {
+                                    return _validatePassword(value);
+                                  },
+                                  onSaved: (value) {
+                                    _userPassword = value;
+                                  },
+                                  onChanged: (value) {
+                                    _userPassword = value;
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    RaisedButton(
+                                      color: Theme.of(context).accentColor,
+                                      shape:
+                                          Theme.of(context).buttonTheme.shape,
+                                      child: Text('Login'),
+                                      onPressed: () {
+                                        if (_clearToAuth()) {
+                                          _isLogin = true;
+                                          _normalSignIn();
+                                        }
+                                      },
+                                    ),
+                                    SizedBox(
+                                      width: 20,
+                                    ),
+                                    RaisedButton(
+                                      color: Theme.of(context).accentColor,
+                                      shape:
+                                          Theme.of(context).buttonTheme.shape,
+                                      child: Text('Signup'),
+                                      onPressed: () {
+                                        if (_clearToAuth()) {
+                                          _isLogin = false;
+                                          _normalSignIn();
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                RaisedButton(
+                                  shape: Theme.of(context).buttonTheme.shape,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(5.0),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Image(
+                                          image: AssetImage(
+                                              'assets/google_logo.png'),
+                                          height: 25,
+                                        ),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text('Use google account'),
+                                      ],
+                                    ),
                                   ),
-                                  Text('Use google account'),
-                                ],
-                              ),
+                                  onPressed: _googleSignIn,
+                                ),
+                              ],
                             ),
-                            onPressed: _googleSignIn,
                           ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ),
-          ),
         ),
       ),
     );

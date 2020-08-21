@@ -1,4 +1,6 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+
 import '../services/authService.dart';
 import 'loginAndRegisterationScreen.dart';
 import 'homeScreen.dart';
@@ -16,6 +18,7 @@ class SplachScreen extends StatefulWidget {
 
 class _SplachScreenState extends State<SplachScreen> {
   void initState() {
+    Firebase.initializeApp();
     authService = AuthService(context);
     super.initState();
   }
@@ -25,7 +28,7 @@ class _SplachScreenState extends State<SplachScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Intercom',
+          'Welcome To Intercom Building 406',
           style: TextStyle(fontSize: 35),
         ),
       ),
@@ -39,7 +42,7 @@ class _SplachScreenState extends State<SplachScreen> {
               child: Text("Intercom",
                   style: TextStyle(
                       fontSize: MediaQuery.of(context).size.width * 0.05)),
-            )
+            ),
           ],
         ),
       ),
