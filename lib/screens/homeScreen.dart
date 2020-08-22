@@ -31,9 +31,9 @@ class _HomeScreenState extends State<HomeScreen> {
       color: Colors.white,
       home: Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           title: Row(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               FlatButton(
                 child: Text(
@@ -54,6 +54,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Text(
                 'Welcome',
+                style: TextStyle(
+                  fontSize: 30,
+                ),
+              ),
+              Opacity(
+                opacity: 0.0,
+                child: Text(
+                  'Welcome',
+                ),
               ),
               // Text(
               //   'Welcome, ',
@@ -69,60 +78,6 @@ class _HomeScreenState extends State<HomeScreen> {
               // ),
             ],
           ),
-        ),
-
-        //FAB
-        floatingActionButton: FloatingActionButton.extended(
-            label: Text('Add data'),
-            onPressed: () {
-              //Add data to the map
-              userProfile[userProfile.length.toString()] =
-                  DateTime.now().toString();
-
-              //update the Firestore database
-              authService.setData().then((success) {
-                //If not successfully uploaded, remove the previous change
-                if (!success) userProfile.remove(userProfile.length - 1);
-              });
-
-              //rebuild the widget tree
-              setState(() {});
-            }),
-
-        //Body
-        body: //Home
-            Column(
-          children: <Widget>[
-            Container(
-              height: 50,
-              child: RaisedButton(
-                child: new Text(
-                  'Clear',
-                  style: TextStyle(fontSize: 19),
-                ),
-                onPressed: () {
-                  setState(() {
-                    userProfile.clear();
-                  });
-                  //update the database
-                  authService.setData();
-                },
-              ),
-            ),
-            userProfile == null
-                ? Center(child: Text('No Data'))
-                : Container(
-                    height: MediaQuery.of(context).size.height - 150,
-                    child: ListView.builder(
-                        itemCount: userProfile.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                              title: Text(userProfile.keys.elementAt(index)),
-                              subtitle:
-                                  Text(userProfile.values.elementAt(index)));
-                        }),
-                  ),
-          ],
         ),
       ),
     );

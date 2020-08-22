@@ -156,7 +156,7 @@ class _LoginAndRegisterationScreenState
         ),
         body: Center(
           child: !_isAPIDone
-              ? SpinKitChasingDots(color: Colors.blue, size: 50.0)
+              ? SpinKitWave(color: Colors.blue, size: 50.0)
               : Container(
                   width: 500,
                   child: Center(

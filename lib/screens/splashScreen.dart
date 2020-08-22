@@ -39,9 +39,12 @@ class _SplachScreenState extends State<SplachScreen> {
           children: <Widget>[
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text("Intercom",
-                  style: TextStyle(
-                      fontSize: MediaQuery.of(context).size.width * 0.05)),
+              child: Text(
+                "Intercom",
+                style: TextStyle(
+                  fontSize: 30,
+                ),
+              ),
             ),
           ],
         ),
