@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -58,14 +56,15 @@ class _SplachScreenState extends State<SplachScreen> {
 }
 
 void mainNavigationPage(BuildContext context) {
-  sleep(Duration(seconds: 3));
-  if (blIsSignedIn) {
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => HomeScreen()));
-  } else {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => LoginAndRegisterationScreen()),
-    );
-  }
+  Future.delayed(new Duration(seconds: 3)).whenComplete(() {
+    if (blIsSignedIn) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => HomeScreen()));
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginAndRegisterationScreen()),
+      );
+    }
+  });
 }

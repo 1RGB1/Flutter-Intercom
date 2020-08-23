@@ -1,8 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 
-import 'package:flutter_intercom/screens/splashScreen.dart';
-import 'package:flutter_intercom/screens/loginAndRegisterationScreen.dart';
+import 'splashScreen.dart';
+import 'loginAndRegisterationScreen.dart';
 //==================This is the Homepage for the app==================s
 
 class HomeScreen extends StatefulWidget {
@@ -14,11 +16,19 @@ class _HomeScreenState extends State<HomeScreen> {
   var _isDoorClosed = true;
   var _openCloseButtonText = 'Open';
   var _openCloseButtonColor = Colors.deepPurple;
+  Timer _timer;
+  var _time = 10;
 
   @override
   void initState() {
     //loadUserData();
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _endTime();
+    super.dispose();
   }
 
   //Loads user data
@@ -30,17 +40,48 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _openCloseAction() {
-    print('Test');
     setState(() {
-      _openCloseButtonColor = (_isDoorClosed) ? Colors.deepPurple : Colors.red;
-      _openCloseButtonText = (_isDoorClosed) ? 'Open' : 'Close';
+      _isDoorClosed = !_isDoorClosed;
+      if (_isDoorClosed) {
+        _endTime();
+      } else {
+        _startTime();
+      }
+      _toggleOpenCloseButton();
     });
+  }
+
+  void _toggleOpenCloseButton() {
+    _openCloseButtonColor = (_isDoorClosed) ? Colors.deepPurple : Colors.red;
+    _openCloseButtonText = (_isDoorClosed) ? 'Open' : 'Close';
+  }
+
+  void _startTime() {
+    _timer = Timer.periodic(
+      Duration(seconds: 1),
+      (timer) => setState(
+        () {
+          if (_time < 1) {
+            _endTime();
+          } else {
+            _time -= 1;
+          }
+        },
+      ),
+    );
+  }
+
+  void _endTime() {
+    _timer.cancel();
+    _time = 10;
+    _isDoorClosed = true;
+    _toggleOpenCloseButton();
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      //debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false,
       color: Colors.white,
       home: Scaffold(
         appBar: AppBar(
@@ -131,7 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 margin: EdgeInsets.only(bottom: 20.0),
                 child: Text(
-                  'Timer',
+                  (!_isDoorClosed && _time >= 1) ? '$_time' : '',
                   style: TextStyle(
                     fontSize: (kIsWeb) ? 45 : 15,
                     fontWeight: FontWeight.bold,
