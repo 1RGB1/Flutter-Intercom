@@ -1,7 +1,5 @@
 {
   "projects": {
-    "default": "flutter-intercom-145f6",
-    "Flutter Intercom": "flutter-intercom-145f6",
-    "intercom": "flutter-intercom-145f6"
+    "Building Intercom": "flutter-intercom-145f6"
   }
 }

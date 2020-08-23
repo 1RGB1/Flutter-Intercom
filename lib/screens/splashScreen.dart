@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import '../services/authService.dart';
 import 'loginAndRegisterationScreen.dart';
@@ -28,7 +31,7 @@ class _SplachScreenState extends State<SplachScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Welcome To Intercom Building 406',
+          'Intercom',
           style: TextStyle(fontSize: 35),
         ),
       ),
@@ -40,9 +43,10 @@ class _SplachScreenState extends State<SplachScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                "Intercom",
+                "Welcome to Intercom Building 406",
+                textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: 30,
+                  fontSize: (kIsWeb) ? 50 : 30,
                 ),
               ),
             ),
@@ -54,6 +58,7 @@ class _SplachScreenState extends State<SplachScreen> {
 }
 
 void mainNavigationPage(BuildContext context) {
+  sleep(Duration(seconds: 3));
   if (blIsSignedIn) {
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => HomeScreen()));

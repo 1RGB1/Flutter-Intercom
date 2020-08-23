@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
-import 'splashScreen.dart';
-import 'loginAndRegisterationScreen.dart';
-import '../services/authService.dart';
+import 'package:flutter_intercom/screens/splashScreen.dart';
+import 'package:flutter_intercom/screens/loginAndRegisterationScreen.dart';
 //==================This is the Homepage for the app==================s
 
 class HomeScreen extends StatefulWidget {
@@ -11,9 +11,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  var _isDoorClosed = true;
+  var _openCloseButtonText = 'Open';
+  var _openCloseButtonColor = Colors.deepPurple;
+
   @override
   void initState() {
-    loadUserData();
+    //loadUserData();
     super.initState();
   }
 
@@ -25,9 +29,18 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {});
   }
 
+  void _openCloseAction() {
+    print('Test');
+    setState(() {
+      _openCloseButtonColor = (_isDoorClosed) ? Colors.deepPurple : Colors.red;
+      _openCloseButtonText = (_isDoorClosed) ? 'Open' : 'Close';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      //debugShowCheckedModeBanner: false,
       color: Colors.white,
       home: Scaffold(
         appBar: AppBar(
@@ -55,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 'Welcome',
                 style: TextStyle(
-                  fontSize: 30,
+                  fontSize: 35,
                 ),
               ),
               Opacity(
@@ -76,6 +89,72 @@ class _HomeScreenState extends State<HomeScreen> {
               //     fontWeight: FontWeight.bold,
               //   ),
               // ),
+            ],
+          ),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                margin: EdgeInsets.only(bottom: 10.0),
+                child: Text(
+                  'Building 406',
+                  style: TextStyle(
+                    fontSize: (kIsWeb) ? 65 : 35,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).accentColor,
+                  ),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(bottom: 10.0),
+                child: Text(
+                  'Door Control',
+                  style: TextStyle(
+                    fontSize: (kIsWeb) ? 55 : 25,
+                    color: Theme.of(context).accentColor,
+                  ),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(bottom: 10.0),
+                child: Text(
+                  'Closed',
+                  style: TextStyle(
+                    fontSize: (kIsWeb) ? 55 : 25,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).accentColor,
+                  ),
+                ),
+              ),
+              Container(
+                margin: EdgeInsets.only(bottom: 20.0),
+                child: Text(
+                  'Timer',
+                  style: TextStyle(
+                    fontSize: (kIsWeb) ? 45 : 15,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).accentColor,
+                  ),
+                ),
+              ),
+              RaisedButton(
+                color: _openCloseButtonColor,
+                shape: Theme.of(context).buttonTheme.shape,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Text(
+                    _openCloseButtonText,
+                    style: TextStyle(
+                      fontSize: (kIsWeb) ? 35 : 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                onPressed: _openCloseAction,
+              ),
             ],
           ),
         ),
