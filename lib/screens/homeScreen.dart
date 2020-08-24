@@ -2,26 +2,38 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_intercom/models/userModel.dart';
+import 'package:flutter_intercom/util/validator.dart';
+import 'package:flutter_intercom/widgets/customeAlertDialog.dart';
 
 import 'splashScreen.dart';
 import 'loginAndRegisterationScreen.dart';
 //==================This is the Homepage for the app==================s
 
 class HomeScreen extends StatefulWidget {
+  final UserModel userModel;
+
+  HomeScreen({@required this.userModel});
+
   @override
-  _HomeScreenState createState() => new _HomeScreenState();
+  _HomeScreenState createState() => new _HomeScreenState(userModel: userModel);
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  UserModel userModel;
+  final _formKey = GlobalKey<FormState>();
+  var _isInfoUpdated = false;
   var _isDoorClosed = true;
   var _openCloseButtonText = 'Open';
   var _openCloseButtonColor = Colors.deepPurple;
   Timer _timer;
   var _time = 10;
 
+  _HomeScreenState({@required this.userModel});
+
   @override
   void initState() {
-    //loadUserData();
+    _isInfoUpdated = (userModel.flatNumber != null) ? true : false;
     super.initState();
   }
 
@@ -31,24 +43,40 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  //Loads user data
-  Future<void> loadUserData() async {
-    //Get the data from firestore
-    await authService.getData();
-    //Not setState, to reflect the changes of Map to the widget tree
-    setState(() {});
+  bool _checkFieldsValidation() {
+    FocusScope.of(context).unfocus();
+    return _formKey.currentState.validate();
   }
 
+  //Load configuration data
+  // Future<void> _loadUserData() async {
+  //   // await authService.getUserData(userModel.email).then((value) => null);
+  //   // setState(() {});
+  // }
+
   void _openCloseAction() {
-    setState(() {
-      _isDoorClosed = !_isDoorClosed;
-      if (_isDoorClosed) {
-        _endTime();
-      } else {
-        _startTime();
-      }
-      _toggleOpenCloseButton();
-    });
+    if (_isInfoUpdated) {
+      setState(() {
+        _isDoorClosed = !_isDoorClosed;
+        if (_isDoorClosed) {
+          _endTime();
+        } else {
+          _startTime();
+        }
+        _toggleOpenCloseButton();
+      });
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return CustomeAlertDialog(
+            context: context,
+            title: 'Error!',
+            message: 'Please enter flat number and username first',
+          );
+        },
+      );
+    }
   }
 
   void _toggleOpenCloseButton() {
@@ -78,6 +106,27 @@ class _HomeScreenState extends State<HomeScreen> {
     _toggleOpenCloseButton();
   }
 
+  void _startIntercom() {
+    authService.setUserData(userModel).then((isSuccess) {
+      if (!isSuccess) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return CustomeAlertDialog(
+              context: context,
+              title: 'Error!',
+              message: 'Something went wrong',
+            );
+          },
+        );
+      } else {
+        setState(() {
+          _isInfoUpdated = true;
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -100,10 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onPressed: () {
                   authService.signOut();
                   Navigator.pop(context);
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => LoginAndRegisterationScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginAndRegisterationScreen()));
                 },
               ),
               Text(
@@ -112,24 +158,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontSize: 35,
                 ),
               ),
+              Text(
+                (userModel.username != null) ? ', ' + userModel.username : '',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               Opacity(
                 opacity: 0.0,
                 child: Text(
                   'Welcome',
                 ),
               ),
-              // Text(
-              //   'Welcome, ',
-              // ),
-              // Text(
-              //   (firebaseUser.displayName != null)
-              //       ? firebaseUser.displayName
-              //       : firebaseUser.email,
-              //   style: TextStyle(
-              //     color: Colors.black,
-              //     fontWeight: FontWeight.bold,
-              //   ),
-              // ),
             ],
           ),
         ),
@@ -137,6 +178,71 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              if (!_isInfoUpdated)
+                Container(
+                  width: 500,
+                  child: Center(
+                    child: Card(
+                      margin: EdgeInsets.all(20),
+                      child: SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                TextFormField(
+                                  key: ValueKey('username'),
+                                  decoration: InputDecoration(
+                                    labelText: 'User Name',
+                                  ),
+                                  validator: (value) {
+                                    return Validator.validateUserName(value);
+                                  },
+                                  onSaved: (value) {
+                                    userModel.username = value;
+                                  },
+                                  onChanged: (value) {
+                                    userModel.username = value;
+                                  },
+                                ),
+                                TextFormField(
+                                  key: ValueKey('flatNumber'),
+                                  decoration: InputDecoration(
+                                    labelText: 'Flat Number',
+                                  ),
+                                  validator: (value) {
+                                    return Validator.validateFlatNumber(value);
+                                  },
+                                  onSaved: (value) {
+                                    userModel.flatNumber = value;
+                                  },
+                                  onChanged: (value) {
+                                    userModel.flatNumber = value;
+                                  },
+                                ),
+                                SizedBox(
+                                  height: 12,
+                                ),
+                                RaisedButton(
+                                  color: Theme.of(context).accentColor,
+                                  shape: Theme.of(context).buttonTheme.shape,
+                                  child: Text('Start Intercom'),
+                                  onPressed: () {
+                                    if (_checkFieldsValidation()) {
+                                      _startIntercom();
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               Container(
                 margin: EdgeInsets.only(bottom: 10.0),
                 child: Text(

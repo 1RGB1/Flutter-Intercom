@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_intercom/models/userModel.dart';
+import 'package:flutter_intercom/services/authService.dart';
 
 import '../screens/splashScreen.dart';
 import '../screens/homeScreen.dart';
@@ -15,13 +17,21 @@ class _GoogleButtonState extends State<GoogleButton> {
     setState(() {
       _isProcessing = true;
     });
-    await authService.googleMethodAuth().then((result) {
-      print(result);
+    await authService.googleMethodAuth().then((user) {
+      print(user);
       Navigator.of(context).pop();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           fullscreenDialog: true,
-          builder: (context) => HomeScreen(),
+          builder: (context) => HomeScreen(
+            userModel: UserModel(
+              email: firebaseUser.email,
+              flatNumber: null,
+              isDoorClosed: true,
+              password: null,
+              username: null,
+            ),
+          ),
         ),
       );
     }).catchError((error) {

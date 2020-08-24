@@ -1,23 +1,26 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_intercom/models/userModel.dart';
+import 'package:flutter_intercom/util/utilities.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../screens/splashScreen.dart';
 
 User firebaseUser;
-//For storing user Profile info
-Map<String, dynamic> userProfile = new Map();
 
-//This is the main Firebase auth object
-FirebaseAuth _auth = FirebaseAuth.instance;
+Map<String, dynamic> _userProfile = new Map();
 
-// For google sign in
+UserModel _userModel;
+
+final FirebaseAuth _auth = FirebaseAuth.instance;
+
 final GoogleSignIn _googleSignIn = GoogleSignIn();
 
-//CloudFireStore
 FirebaseFirestore _dbFirestore = FirebaseFirestore.instance;
 
 BuildContext _context;
@@ -27,7 +30,7 @@ class AuthService {
   AuthService(BuildContext ctx) {
     _context = ctx;
     checkIsSignedIn().then((_blIsSignedIn) {
-      mainNavigationPage(_context);
+      mainNavigationPage(_context, _userModel);
     });
   }
 
@@ -39,9 +42,9 @@ class AuthService {
     if (!authSignedIn) {
       blIsSignedIn = false;
     } else {
-      if (_auth != null &&
-          ((await _googleSignIn.isSignedIn()) || (_auth.currentUser != null))) {
+      if (_auth != null && ((await _googleSignIn.isSignedIn()) || (_auth.currentUser != null))) {
         firebaseUser = _auth.currentUser;
+        _userModel = await getUserData(firebaseUser.email);
         blIsSignedIn = (firebaseUser != null) ? true : false;
       } else {
         blIsSignedIn = false;
@@ -59,8 +62,7 @@ class AuthService {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      UserCredential signinCredential =
-          await _auth.signInWithCredential(credential);
+      UserCredential signinCredential = await _auth.signInWithCredential(credential);
       firebaseUser = signinCredential.user;
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('auth', true);
@@ -83,19 +85,23 @@ class AuthService {
   }
 
   //Login or Register using normal method authentication
-  Future<dynamic> normalMethodAuthWithEmail(
-      String email, String password, bool isLogin) async {
-    return (isLogin)
-        ? await _loginWithEmailAndPassword(email, password)
-        : await _registerWithEmailAndPassword(email, password);
+  Future<dynamic> normalMethodAuthWithEmail(UserModel userModel, bool isLogin) async {
+    User user = (isLogin)
+        ? await _loginWithEmailAndPassword(userModel.email, userModel.password)
+        : await _registerWithEmailAndPassword(userModel.email, userModel.password);
+
+    if (user != null) {
+      setUserData(userModel);
+    }
+
+    return user;
   }
 
   //Register using email and password
-  Future<dynamic> _registerWithEmailAndPassword(
-      String email, String password) async {
+  Future<dynamic> _registerWithEmailAndPassword(String email, String password) async {
     try {
-      final UserCredential credential = await _auth
-          .createUserWithEmailAndPassword(email: email, password: password);
+      final UserCredential credential =
+          await _auth.createUserWithEmailAndPassword(email: email, password: password);
       firebaseUser = credential.user;
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('auth', true);
@@ -117,11 +123,10 @@ class AuthService {
   }
 
   //Login using email and password
-  Future<dynamic> _loginWithEmailAndPassword(
-      String email, String password) async {
+  Future<dynamic> _loginWithEmailAndPassword(String email, String password) async {
     try {
-      final UserCredential credential = await _auth.signInWithEmailAndPassword(
-          email: email, password: password);
+      final UserCredential credential =
+          await _auth.signInWithEmailAndPassword(email: email, password: password);
       firebaseUser = credential.user;
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('auth', true);
@@ -143,26 +148,30 @@ class AuthService {
   }
 
   //Gets the userData
-  getData() async {
-    _dbFirestore
-        .collection("Master")
-        .doc(firebaseUser.email)
-        .snapshots()
-        .listen((snapshot) {
+  Future<UserModel> getUserData(String userEmail) async {
+    UserModel userModel;
+
+    _dbFirestore.collection("users").doc(userEmail).snapshots().listen((snapshot) async {
       if (snapshot.data() != null) {
-        userProfile = snapshot.data();
+        _userProfile = snapshot.data();
+        userModel = Utilities.userProfileToUserModelMapping(_userProfile);
       }
     });
+    return userModel;
   }
 
   //Update the data into the database
-  Future<bool> setData() async {
+  Future<bool> setUserData(UserModel user) async {
     bool blReturn = false;
-    await _dbFirestore
-        .collection('Master')
-        .doc(firebaseUser.email)
-        .set(userProfile)
-        .then((onValue) async {
+
+    _userProfile = {
+      'flat_number': user.flatNumber,
+      'isDoorClosed': user.isDoorClosed,
+      'password': user.password,
+      'username': user.username
+    };
+
+    await _dbFirestore.collection('users').doc(user.email).set(_userProfile).then((onValue) async {
       blReturn = true;
     });
     return blReturn;
@@ -174,6 +183,7 @@ class AuthService {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('auth', false);
+    prefs.setString('email', null);
   }
 
   //Signout using google method

@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter_intercom/models/userModel.dart';
 
 import '../services/authService.dart';
 import 'loginAndRegisterationScreen.dart';
@@ -55,15 +56,21 @@ class _SplachScreenState extends State<SplachScreen> {
   }
 }
 
-void mainNavigationPage(BuildContext context) {
+void mainNavigationPage(BuildContext context, UserModel userModel) {
   Future.delayed(new Duration(seconds: 3)).whenComplete(() {
     if (blIsSignedIn) {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => HomeScreen()));
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(userModel: userModel),
+        ),
+      );
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => LoginAndRegisterationScreen()),
+        MaterialPageRoute(
+          builder: (context) => LoginAndRegisterationScreen(),
+        ),
       );
     }
   });
