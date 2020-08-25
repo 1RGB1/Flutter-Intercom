@@ -9,6 +9,7 @@ class Utilities {
       isDoorClosed: user['isDoorClosed'],
       password: user['password'],
       username: user['username'],
+      lastOpendDate: user['last_opend'].toString(),
     );
   }
 
@@ -19,7 +20,8 @@ class Utilities {
       'flat_number': user.flatNumber,
       'isDoorClosed': user.isDoorClosed,
       'password': user.password,
-      'username': user.username
+      'username': user.username,
+      'last_opend': user.lastOpendDate
     };
     return userProfile;
   }

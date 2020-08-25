@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_intercom/models/userModel.dart';
 
-import '../services/authService.dart';
+import '../services/firebaseManager.dart';
 import 'loginAndRegisterationScreen.dart';
 import 'homeScreen.dart';
 
-AuthService authService;
+FirebaseManager firebaseManager;
 
 class SplachScreen extends StatefulWidget {
   SplachScreen({Key key, this.title}) : super(key: key);
@@ -21,7 +21,7 @@ class SplachScreen extends StatefulWidget {
 class _SplachScreenState extends State<SplachScreen> {
   void initState() {
     Firebase.initializeApp();
-    authService = AuthService(context);
+    firebaseManager = FirebaseManager(context);
     super.initState();
   }
 

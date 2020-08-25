@@ -37,7 +37,7 @@ class _LoginAndRegisterationScreenState extends State<LoginAndRegisterationScree
   }
 
   UserModel _getUserModel() {
-    authService.getUserData(_userEmail.trim()).then((user) {
+    firebaseManager.getUserData(_userEmail.trim()).then((user) {
       if (user != null) {
         return user;
       }
@@ -54,7 +54,7 @@ class _LoginAndRegisterationScreenState extends State<LoginAndRegisterationScree
 
   //LOGIN USING GOOGLE HERE
   void _googleSignIn() {
-    authService.googleMethodAuth().then((user) {
+    firebaseManager.googleMethodAuth().then((user) {
       if (user == null) {
         showDialog(
           context: context,
@@ -62,7 +62,8 @@ class _LoginAndRegisterationScreenState extends State<LoginAndRegisterationScree
             return CustomeAlertDialog(
               context: context,
               title: 'Failed to log in!',
-              message: 'Please make sure your Google Account is usable. Also make sure that you have a active internet connection, and try again.',
+              message:
+                  'Please make sure your Google Account is usable. Also make sure that you have a active internet connection, and try again.',
             );
           },
         );
@@ -81,7 +82,7 @@ class _LoginAndRegisterationScreenState extends State<LoginAndRegisterationScree
       _isAPIDone = false;
     });
 
-    authService.normalMethodAuthWithEmail(_userModel, _isLogin).whenComplete(() {
+    firebaseManager.normalMethodAuthWithEmail(_userModel, _isLogin).whenComplete(() {
       setState(() {
         _isAPIDone = true;
       });
@@ -93,7 +94,8 @@ class _LoginAndRegisterationScreenState extends State<LoginAndRegisterationScree
               return CustomeAlertDialog(
                 context: context,
                 title: 'Failed to log in!',
-                message: 'Please make sure your Account is usable. Also make sure that you have a active internet connection, and try again.',
+                message:
+                    'Please make sure your Account is usable. Also make sure that you have a active internet connection, and try again.',
               );
             });
       } else {
@@ -159,7 +161,9 @@ class _LoginAndRegisterationScreenState extends State<LoginAndRegisterationScree
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
                                         IconButton(
-                                          icon: Icon(!_obscureText ? Icons.visibility : Icons.visibility_off),
+                                          icon: Icon(!_obscureText
+                                              ? Icons.visibility
+                                              : Icons.visibility_off),
                                           onPressed: _togglePassword,
                                         ),
                                         Icon(Icons.lock),

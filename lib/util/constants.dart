@@ -1,0 +1,1 @@
+enum DoorStatus { closed, opend }

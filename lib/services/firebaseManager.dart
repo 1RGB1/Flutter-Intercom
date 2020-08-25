@@ -10,6 +10,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 import '../screens/splashScreen.dart';
+import '../util/constants.dart';
 
 User firebaseUser;
 
@@ -25,9 +26,11 @@ FirebaseFirestore _dbFirestore = FirebaseFirestore.instance;
 
 BuildContext _context;
 bool blIsSignedIn = false;
+DoorStatus doorStatus = DoorStatus.closed;
+int doorDelay = 0;
 
-class AuthService {
-  AuthService(BuildContext ctx) {
+class FirebaseManager {
+  FirebaseManager(BuildContext ctx) {
     _context = ctx;
     checkIsSignedIn().then((_blIsSignedIn) {
       mainNavigationPage(_context, _userModel);
@@ -151,7 +154,7 @@ class AuthService {
   Future<UserModel> getUserData(String userEmail) async {
     UserModel userModel;
 
-    _dbFirestore.collection("users").doc(userEmail).snapshots().listen((snapshot) async {
+    _dbFirestore.collection('users').doc(userEmail).snapshots().listen((snapshot) async {
       if (snapshot.data() != null) {
         _userProfile = snapshot.data();
         userModel = Utilities.userProfileToUserModelMapping(_userProfile);
@@ -168,13 +171,52 @@ class AuthService {
       'flat_number': user.flatNumber,
       'isDoorClosed': user.isDoorClosed,
       'password': user.password,
-      'username': user.username
+      'username': user.username,
+      'last_opend': FieldValue.serverTimestamp(),
     };
 
     await _dbFirestore.collection('users').doc(user.email).set(_userProfile).then((onValue) async {
       blReturn = true;
     });
     return blReturn;
+  }
+
+  //Get door status
+  getDoorStatus() async {
+    _dbFirestore
+        .collection('door')
+        .doc('zFT2snwlzAUGI1h1RBOg')
+        .snapshots()
+        .listen((snapshot) async {
+      if (snapshot.data() != null) {
+        doorStatus = snapshot.data()['status'];
+      }
+    });
+    doorStatus = DoorStatus.closed;
+  }
+
+  //Get door status
+  Future<void> setDoorStatus(bool isClosed) async {
+    _dbFirestore
+        .collection('door')
+        .doc('zFT2snwlzAUGI1h1RBOg')
+        .set(<String, dynamic>{'status': isClosed});
+  }
+
+  //Get door delay time
+  Future<int> getDoorDelay() async {
+    _dbFirestore
+        .collection('delay')
+        .doc('DLIeVPfBEoxLDo5qihJA')
+        .snapshots()
+        .listen((snapshot) async {
+      if (snapshot.data() != null) {
+        doorDelay = snapshot.data()['door_delay'];
+        return doorDelay;
+      }
+    });
+    doorDelay = 0;
+    return doorDelay;
   }
 
   //Signout using normal method

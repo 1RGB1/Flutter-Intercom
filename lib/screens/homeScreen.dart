@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_intercom/models/userModel.dart';
+import 'package:flutter_intercom/services/firebaseManager.dart';
 import 'package:flutter_intercom/util/validator.dart';
 import 'package:flutter_intercom/widgets/customeAlertDialog.dart';
 
@@ -27,12 +28,15 @@ class _HomeScreenState extends State<HomeScreen> {
   var _openCloseButtonText = 'Open';
   var _openCloseButtonColor = Colors.deepPurple;
   Timer _timer;
-  var _time = 10;
+  var _time = doorDelay;
 
   _HomeScreenState({@required this.userModel});
 
   @override
   void initState() {
+    firebaseManager.getDoorDelay().then((delay) {
+      _time = delay;
+    });
     _isInfoUpdated = (userModel.flatNumber != null) ? true : false;
     super.initState();
   }
@@ -47,12 +51,6 @@ class _HomeScreenState extends State<HomeScreen> {
     FocusScope.of(context).unfocus();
     return _formKey.currentState.validate();
   }
-
-  //Load configuration data
-  // Future<void> _loadUserData() async {
-  //   // await authService.getUserData(userModel.email).then((value) => null);
-  //   // setState(() {});
-  // }
 
   void _openCloseAction() {
     if (_isInfoUpdated) {
@@ -101,13 +99,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _endTime() {
     _timer.cancel();
-    _time = 10;
+    _time = doorDelay;
     _isDoorClosed = true;
     _toggleOpenCloseButton();
   }
 
   void _startIntercom() {
-    authService.setUserData(userModel).then((isSuccess) {
+    firebaseManager.setUserData(userModel).then((isSuccess) {
       if (!isSuccess) {
         showDialog(
           context: context,
@@ -122,6 +120,8 @@ class _HomeScreenState extends State<HomeScreen> {
       } else {
         setState(() {
           _isInfoUpdated = true;
+          _time = doorDelay;
+          print('#### $_time');
         });
       }
     });
@@ -147,9 +147,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 onPressed: () {
-                  authService.signOut();
+                  firebaseManager.signOut();
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => LoginAndRegisterationScreen()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => LoginAndRegisterationScreen()));
                 },
               ),
               Text(

@@ -6,6 +6,7 @@ class UserModel {
   bool isDoorClosed;
   String username;
   String password;
+  String lastOpendDate;
 
   UserModel({
     @required this.email,
@@ -13,5 +14,6 @@ class UserModel {
     @required this.isDoorClosed,
     this.username,
     this.password,
+    this.lastOpendDate,
   });
 }

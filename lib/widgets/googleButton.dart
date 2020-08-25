@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_intercom/models/userModel.dart';
-import 'package:flutter_intercom/services/authService.dart';
+import 'package:flutter_intercom/services/firebaseManager.dart';
 
 import '../screens/splashScreen.dart';
 import '../screens/homeScreen.dart';
@@ -17,8 +17,7 @@ class _GoogleButtonState extends State<GoogleButton> {
     setState(() {
       _isProcessing = true;
     });
-    await authService.googleMethodAuth().then((user) {
-      print(user);
+    await firebaseManager.googleMethodAuth().then((user) {
       Navigator.of(context).pop();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
