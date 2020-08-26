@@ -256,7 +256,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 margin: EdgeInsets.only(bottom: 10.0),
                 child: Text(
-                  'Closed',
+                  _openCloseButtonText,
                   style: TextStyle(
                     fontSize: (kIsWeb) ? 55 : 25,
                     fontWeight: FontWeight.bold,
