@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_intercom/models/userModel.dart';
+import 'package:flutter_intercom/services/firebaseManager.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/foundation.dart';
 
@@ -36,20 +37,22 @@ class _LoginAndRegisterationScreenState extends State<LoginAndRegisterationScree
     return _formKey.currentState.validate();
   }
 
-  UserModel _getUserModel() {
-    firebaseManager.getUserData(_userEmail.trim()).then((user) {
-      if (user != null) {
-        return user;
-      }
-    });
+  _getUserFromFirebase() async {
+    await firebaseManager.getUserData((_userEmail != null) ? _userEmail.trim() : null);
+  }
 
-    return UserModel(
-      email: _userEmail.trim(),
-      flatNumber: null,
-      isDoorClosed: true,
-      password: _userPassword.trim(),
-      username: null,
-    );
+  UserModel _getUserModel() {
+    if (userModel != null) {
+      return userModel;
+    } else {
+      return UserModel(
+        email: (_userEmail != null) ? _userEmail.trim() : null,
+        flatNumber: null,
+        isDoorClosed: true,
+        password: (_userPassword != null) ? _userPassword.trim() : null,
+        username: null,
+      );
+    }
   }
 
   //LOGIN USING GOOGLE HERE
@@ -68,9 +71,11 @@ class _LoginAndRegisterationScreenState extends State<LoginAndRegisterationScree
           },
         );
       } else {
+        _userEmail = firebaseManager.getUserEmailFromGoogle();
+        _userModel = _getUserModel();
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen(userModel: _userModel)),
+          MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       }
     });
@@ -101,7 +106,7 @@ class _LoginAndRegisterationScreenState extends State<LoginAndRegisterationScree
       } else {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen(userModel: _userModel)),
+          MaterialPageRoute(builder: (context) => HomeScreen()),
         );
       }
     });
@@ -190,11 +195,14 @@ class _LoginAndRegisterationScreenState extends State<LoginAndRegisterationScree
                                       color: Theme.of(context).accentColor,
                                       shape: Theme.of(context).buttonTheme.shape,
                                       child: Text('Login'),
-                                      onPressed: () {
+                                      onPressed: () async {
                                         if (_clearToAuth()) {
-                                          _userModel = _getUserModel();
-                                          _isLogin = true;
-                                          _normalSignIn();
+                                          await _getUserFromFirebase();
+                                          Future.delayed(Duration(seconds: 2)).whenComplete(() {
+                                            _userModel = _getUserModel();
+                                            _isLogin = true;
+                                            _normalSignIn();
+                                          });
                                         }
                                       },
                                     ),
@@ -205,11 +213,14 @@ class _LoginAndRegisterationScreenState extends State<LoginAndRegisterationScree
                                       color: Theme.of(context).accentColor,
                                       shape: Theme.of(context).buttonTheme.shape,
                                       child: Text('Signup'),
-                                      onPressed: () {
+                                      onPressed: () async {
                                         if (_clearToAuth()) {
-                                          _userModel = _getUserModel();
-                                          _isLogin = false;
-                                          _normalSignIn();
+                                          await _getUserFromFirebase();
+                                          Future.delayed(Duration(seconds: 2)).whenComplete(() {
+                                            _userModel = _getUserModel();
+                                            _isLogin = false;
+                                            _normalSignIn();
+                                          });
                                         }
                                       },
                                     ),

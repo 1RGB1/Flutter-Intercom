@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_intercom/models/userModel.dart';
 import 'package:flutter_intercom/services/firebaseManager.dart';
 import 'package:flutter_intercom/util/validator.dart';
 import 'package:flutter_intercom/widgets/customeAlertDialog.dart';
@@ -12,16 +11,11 @@ import 'loginAndRegisterationScreen.dart';
 //==================This is the Homepage for the app==================s
 
 class HomeScreen extends StatefulWidget {
-  final UserModel userModel;
-
-  HomeScreen({@required this.userModel});
-
   @override
-  _HomeScreenState createState() => new _HomeScreenState(userModel: userModel);
+  _HomeScreenState createState() => new _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  UserModel userModel;
   final _formKey = GlobalKey<FormState>();
   var _isInfoUpdated = false;
   var _isDoorClosed = true;
@@ -30,14 +24,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Timer _timer;
   var _time = doorDelay;
 
-  _HomeScreenState({@required this.userModel});
-
   @override
   void initState() {
-    firebaseManager.getDoorDelay().then((delay) {
-      _time = delay;
-    });
-    _isInfoUpdated = (userModel.flatNumber != null) ? true : false;
+    firebaseManager.getDoorDelay();
+    if (userModel != null) {
+      _isInfoUpdated = (userModel.flatNumber != null) ? true : false;
+    }
     super.initState();
   }
 
@@ -55,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _openCloseAction() {
     if (_isInfoUpdated) {
       setState(() {
+        _time = doorDelay;
         _isDoorClosed = !_isDoorClosed;
         if (_isDoorClosed) {
           _endTime();
@@ -62,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
           _startTime();
         }
         _toggleOpenCloseButton();
+        firebaseManager.setDoorStatus(_isDoorClosed);
       });
     } else {
       showDialog(
@@ -98,8 +92,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _endTime() {
-    _timer.cancel();
-    _time = doorDelay;
+    if (_time != null) {
+      _timer.cancel();
+      _time = doorDelay;
+    }
     _isDoorClosed = true;
     _toggleOpenCloseButton();
   }
@@ -121,7 +117,6 @@ class _HomeScreenState extends State<HomeScreen> {
         setState(() {
           _isInfoUpdated = true;
           _time = doorDelay;
-          print('#### $_time');
         });
       }
     });
@@ -154,16 +149,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
               ),
               Text(
-                'Welcome',
+                (userModel.username == null) ? 'Welcome' : userModel.username,
                 style: TextStyle(
                   fontSize: 35,
-                ),
-              ),
-              Text(
-                (userModel.username != null) ? ', ' + userModel.username : '',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
               Opacity(

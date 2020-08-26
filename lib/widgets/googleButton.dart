@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_intercom/models/userModel.dart';
-import 'package:flutter_intercom/services/firebaseManager.dart';
 
 import '../screens/splashScreen.dart';
 import '../screens/homeScreen.dart';
@@ -22,15 +20,7 @@ class _GoogleButtonState extends State<GoogleButton> {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           fullscreenDialog: true,
-          builder: (context) => HomeScreen(
-            userModel: UserModel(
-              email: firebaseUser.email,
-              flatNumber: null,
-              isDoorClosed: true,
-              password: null,
-              username: null,
-            ),
-          ),
+          builder: (context) => HomeScreen(),
         ),
       );
     }).catchError((error) {

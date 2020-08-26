@@ -16,9 +16,7 @@ User firebaseUser;
 
 Map<String, dynamic> _userProfile = new Map();
 
-UserModel _userModel;
-
-final FirebaseAuth _auth = FirebaseAuth.instance;
+UserModel userModel;
 
 final GoogleSignIn _googleSignIn = GoogleSignIn();
 
@@ -33,7 +31,7 @@ class FirebaseManager {
   FirebaseManager(BuildContext ctx) {
     _context = ctx;
     checkIsSignedIn().then((_blIsSignedIn) {
-      mainNavigationPage(_context, _userModel);
+      mainNavigationPage(_context);
     });
   }
 
@@ -45,15 +43,21 @@ class FirebaseManager {
     if (!authSignedIn) {
       blIsSignedIn = false;
     } else {
-      if (_auth != null && ((await _googleSignIn.isSignedIn()) || (_auth.currentUser != null))) {
-        firebaseUser = _auth.currentUser;
-        _userModel = await getUserData(firebaseUser.email);
+      if (FirebaseAuth.instance != null &&
+          ((await _googleSignIn.isSignedIn()) || (FirebaseAuth.instance.currentUser != null))) {
+        firebaseUser = FirebaseAuth.instance.currentUser;
+        await getUserData(firebaseUser.email);
         blIsSignedIn = (firebaseUser != null) ? true : false;
       } else {
         blIsSignedIn = false;
       }
     }
     return blIsSignedIn;
+  }
+
+  //Get user when using google method
+  String getUserEmailFromGoogle() {
+    return (_googleSignIn.currentUser != null) ? _googleSignIn.currentUser.email : null;
   }
 
   //Log in using google
@@ -65,8 +69,10 @@ class FirebaseManager {
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      UserCredential signinCredential = await _auth.signInWithCredential(credential);
+      UserCredential signinCredential =
+          await FirebaseAuth.instance.signInWithCredential(credential);
       firebaseUser = signinCredential.user;
+      await getUserData(firebaseUser.email);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('auth', true);
     } on PlatformException catch (error) {
@@ -88,13 +94,14 @@ class FirebaseManager {
   }
 
   //Login or Register using normal method authentication
-  Future<dynamic> normalMethodAuthWithEmail(UserModel userModel, bool isLogin) async {
+  Future<dynamic> normalMethodAuthWithEmail(UserModel model, bool isLogin) async {
     User user = (isLogin)
-        ? await _loginWithEmailAndPassword(userModel.email, userModel.password)
-        : await _registerWithEmailAndPassword(userModel.email, userModel.password);
+        ? await _loginWithEmailAndPassword(model.email, model.password)
+        : await _registerWithEmailAndPassword(model.email, model.password);
 
-    if (user != null) {
-      setUserData(userModel);
+    if (user != null && !isLogin) {
+      setUserData(model);
+      userModel = model;
     }
 
     return user;
@@ -103,8 +110,8 @@ class FirebaseManager {
   //Register using email and password
   Future<dynamic> _registerWithEmailAndPassword(String email, String password) async {
     try {
-      final UserCredential credential =
-          await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      final UserCredential credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
       firebaseUser = credential.user;
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('auth', true);
@@ -129,7 +136,7 @@ class FirebaseManager {
   Future<dynamic> _loginWithEmailAndPassword(String email, String password) async {
     try {
       final UserCredential credential =
-          await _auth.signInWithEmailAndPassword(email: email, password: password);
+          await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
       firebaseUser = credential.user;
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('auth', true);
@@ -151,16 +158,17 @@ class FirebaseManager {
   }
 
   //Gets the userData
-  Future<UserModel> getUserData(String userEmail) async {
-    UserModel userModel;
-
-    _dbFirestore.collection('users').doc(userEmail).snapshots().listen((snapshot) async {
-      if (snapshot.data() != null) {
-        _userProfile = snapshot.data();
-        userModel = Utilities.userProfileToUserModelMapping(_userProfile);
-      }
-    });
-    return userModel;
+  getUserData(String userEmail) {
+    Future.wait([
+      _dbFirestore.collection('users').doc(userEmail).get().then((snapshot) {
+        if (snapshot.data() != null) {
+          _userProfile = snapshot.data();
+          userModel = Utilities.userProfileToUserModelMapping(_userProfile);
+          userModel.email = userEmail;
+          return userModel;
+        }
+      })
+    ]);
   }
 
   //Update the data into the database
@@ -172,7 +180,7 @@ class FirebaseManager {
       'isDoorClosed': user.isDoorClosed,
       'password': user.password,
       'username': user.username,
-      'last_opend': FieldValue.serverTimestamp(),
+      'last_opend': user.lastOpendDate,
     };
 
     await _dbFirestore.collection('users').doc(user.email).set(_userProfile).then((onValue) async {
@@ -189,22 +197,46 @@ class FirebaseManager {
         .snapshots()
         .listen((snapshot) async {
       if (snapshot.data() != null) {
-        doorStatus = snapshot.data()['status'];
+        doorStatus = snapshot.data()['isClosed'] ? DoorStatus.closed : DoorStatus.closed;
       }
     });
-    doorStatus = DoorStatus.closed;
   }
 
   //Get door status
-  Future<void> setDoorStatus(bool isClosed) async {
+  setDoorStatus(bool isClosed) async {
     _dbFirestore
         .collection('door')
         .doc('zFT2snwlzAUGI1h1RBOg')
         .set(<String, dynamic>{'status': isClosed});
+
+    _getServerDate();
+  }
+
+  //Set server date
+  _getServerDate() async {
+    Future.wait([
+      _dbFirestore
+          .collection('serverTimeStamp')
+          .doc('gf7LGjpwBsu33Cokpwxi')
+          .set(<String, dynamic>{'createdAt': FieldValue.serverTimestamp()})
+    ]).whenComplete(() {
+      _dbFirestore
+          .collection('serverTimeStamp')
+          .doc('gf7LGjpwBsu33Cokpwxi')
+          .snapshots()
+          .listen((snapshot) async {
+        if (snapshot.data() != null) {
+          if (snapshot.data()['createdAt'] != null) {
+            userModel.lastOpendDate = snapshot.data()['createdAt'].toDate().toIso8601String();
+            setUserData(userModel);
+          }
+        }
+      });
+    });
   }
 
   //Get door delay time
-  Future<int> getDoorDelay() async {
+  getDoorDelay() async {
     _dbFirestore
         .collection('delay')
         .doc('DLIeVPfBEoxLDo5qihJA')
@@ -212,16 +244,13 @@ class FirebaseManager {
         .listen((snapshot) async {
       if (snapshot.data() != null) {
         doorDelay = snapshot.data()['door_delay'];
-        return doorDelay;
       }
     });
-    doorDelay = 0;
-    return doorDelay;
   }
 
   //Signout using normal method
   void signOut() async {
-    _auth.signOut();
+    FirebaseAuth.instance.signOut();
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('auth', false);
