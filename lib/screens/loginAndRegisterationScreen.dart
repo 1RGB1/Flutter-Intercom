@@ -71,12 +71,14 @@ class _LoginAndRegisterationScreenState extends State<LoginAndRegisterationScree
           },
         );
       } else {
-        _userEmail = firebaseManager.getUserEmailFromGoogle();
-        _userModel = _getUserModel();
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
+        Future.delayed(Duration(seconds: 3)).whenComplete(() {
+          _userEmail = firebaseManager.getUserEmailFromGoogle();
+          _userModel = _getUserModel();
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+          );
+        });
       }
     });
   }

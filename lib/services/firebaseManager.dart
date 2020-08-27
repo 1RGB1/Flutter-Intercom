@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -39,17 +40,23 @@ class FirebaseManager {
   Future<bool> checkIsSignedIn() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     bool authSignedIn = prefs.getBool('auth') ?? false;
+    String userEmail = prefs.getString('userEmail');
 
-    if (!authSignedIn) {
+    if (!authSignedIn || userEmail == null) {
       blIsSignedIn = false;
     } else {
-      if (FirebaseAuth.instance != null &&
-          ((await _googleSignIn.isSignedIn()) || (FirebaseAuth.instance.currentUser != null))) {
-        firebaseUser = FirebaseAuth.instance.currentUser;
-        await getUserData(firebaseUser.email);
-        blIsSignedIn = (firebaseUser != null) ? true : false;
+      if (kIsWeb) {
+        await getUserData(userEmail);
+        blIsSignedIn = true;
       } else {
-        blIsSignedIn = false;
+        if (FirebaseAuth.instance != null &&
+            ((await _googleSignIn.isSignedIn()) || (FirebaseAuth.instance.currentUser != null))) {
+          firebaseUser = FirebaseAuth.instance.currentUser;
+          await getUserData(firebaseUser.email);
+          blIsSignedIn = (firebaseUser != null) ? true : false;
+        } else {
+          blIsSignedIn = false;
+        }
       }
     }
     return blIsSignedIn;
@@ -75,6 +82,7 @@ class FirebaseManager {
       await getUserData(firebaseUser.email);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('auth', true);
+      prefs.setString('userEmail', firebaseUser.email);
     } on PlatformException catch (error) {
       var message = (error.message != null)
           ? error.message
@@ -115,6 +123,7 @@ class FirebaseManager {
       firebaseUser = credential.user;
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('auth', true);
+      prefs.setString('userEmail', email);
     } on PlatformException catch (error) {
       var message = (error.message != null)
           ? error.message
@@ -140,6 +149,7 @@ class FirebaseManager {
       firebaseUser = credential.user;
       SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setBool('auth', true);
+      prefs.setString('userEmail', email);
     } on PlatformException catch (error) {
       var message = (error.message != null)
           ? error.message
@@ -254,7 +264,7 @@ class FirebaseManager {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('auth', false);
-    prefs.setString('email', null);
+    prefs.setString('userEmail', null);
   }
 
   //Signout using google method
@@ -263,5 +273,6 @@ class FirebaseManager {
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('auth', false);
+    prefs.setString('userEmail', null);
   }
 }
