@@ -7,7 +7,7 @@
     "rules": "database.rules.json"
   },
   "hosting": {
-    "site": "building-intercom",
+    "site": "buildingintercom",
     "public": "build/web",
     "ignore": [
       "firebase.json",
@@ -20,5 +20,8 @@
         "destination": "/index.html"
       }
     ]
+  },
+  "storage": {
+    "rules": "storage.rules"
   }
 }
