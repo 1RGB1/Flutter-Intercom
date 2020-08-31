@@ -27,6 +27,7 @@ BuildContext _context;
 bool blIsSignedIn = false;
 DoorStatus doorStatus = DoorStatus.closed;
 int doorDelay = 0;
+String buildingName = '';
 
 class FirebaseManager {
   FirebaseManager(BuildContext ctx) {
@@ -202,12 +203,12 @@ class FirebaseManager {
   //Get door status
   getDoorStatus() async {
     _dbFirestore
-        .collection('door')
-        .doc('zFT2snwlzAUGI1h1RBOg')
+        .collection('building')
+        .doc('7jDdH9Q4UsP06kDAyGN0')
         .snapshots()
         .listen((snapshot) async {
       if (snapshot.data() != null) {
-        doorStatus = snapshot.data()['isClosed'] ? DoorStatus.closed : DoorStatus.closed;
+        doorStatus = snapshot.data()['door_is_closed'] ? DoorStatus.closed : DoorStatus.closed;
       }
     });
   }
@@ -215,9 +216,9 @@ class FirebaseManager {
   //Get door status
   setDoorStatus(bool isClosed) async {
     _dbFirestore
-        .collection('door')
-        .doc('zFT2snwlzAUGI1h1RBOg')
-        .set(<String, dynamic>{'status': isClosed});
+        .collection('building')
+        .doc('7jDdH9Q4UsP06kDAyGN0')
+        .update(<String, dynamic>{'door_is_closed': isClosed});
 
     _getServerDate();
   }
@@ -248,12 +249,25 @@ class FirebaseManager {
   //Get door delay time
   getDoorDelay() async {
     _dbFirestore
-        .collection('delay')
-        .doc('DLIeVPfBEoxLDo5qihJA')
+        .collection('building')
+        .doc('7jDdH9Q4UsP06kDAyGN0')
         .snapshots()
         .listen((snapshot) async {
       if (snapshot.data() != null) {
-        doorDelay = snapshot.data()['door_delay'];
+        doorDelay = snapshot.data()['door_delay_time'];
+      }
+    });
+  }
+
+  //Get Building name
+  getBuildingName() async {
+    _dbFirestore
+        .collection('building')
+        .doc('7jDdH9Q4UsP06kDAyGN0')
+        .snapshots()
+        .listen((snapshot) async {
+      if (snapshot.data() != null) {
+        buildingName = snapshot.data()['name'];
       }
     });
   }

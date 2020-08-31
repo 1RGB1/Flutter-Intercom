@@ -235,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 margin: EdgeInsets.only(bottom: 10.0),
                 child: Text(
-                  'Building 406',
+                  'Building $buildingName',
                   style: TextStyle(
                     fontSize: (kIsWeb) ? 65 : 35,
                     fontWeight: FontWeight.bold,

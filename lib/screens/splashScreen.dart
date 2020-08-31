@@ -21,7 +21,13 @@ class _SplachScreenState extends State<SplachScreen> {
   void initState() {
     Firebase.initializeApp();
     firebaseManager = FirebaseManager(context);
+    _getBuildingName();
     super.initState();
+  }
+
+  _getBuildingName() {
+    firebaseManager.getBuildingName();
+    Future.delayed(Duration(seconds: 2));
   }
 
   @override
@@ -41,7 +47,7 @@ class _SplachScreenState extends State<SplachScreen> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                "Welcome to Intercom Building 406",
+                "Welcome to Intercom Building $buildingName",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: (kIsWeb) ? 50 : 30,
