@@ -19,7 +19,7 @@ class SplachScreen extends StatefulWidget {
 
 class _SplachScreenState extends State<SplachScreen> {
   void initState() {
-    Firebase.initializeApp();
+    Firebase.initializeApp(name: 'Flutter Intercom');
     firebaseManager = FirebaseManager(context);
     firebaseManager.getBuildingName();
     super.initState();

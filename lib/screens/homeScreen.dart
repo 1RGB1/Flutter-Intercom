@@ -240,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       'Building $buildingName',
                       style: TextStyle(
-                        fontSize: (kIsWeb) ? 65 : 35,
+                        fontSize: (kIsWeb) ? 65 : 25,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).accentColor,
                       ),
@@ -251,7 +251,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       'Door Control',
                       style: TextStyle(
-                        fontSize: (kIsWeb) ? 55 : 25,
+                        fontSize: (kIsWeb) ? 55 : 15,
                         color: Theme.of(context).accentColor,
                       ),
                     ),
@@ -261,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Text(
                       _openCloseButtonText,
                       style: TextStyle(
-                        fontSize: (kIsWeb) ? 55 : 25,
+                        fontSize: (kIsWeb) ? 55 : 15,
                         fontWeight: FontWeight.bold,
                         color: Theme.of(context).accentColor,
                       ),
