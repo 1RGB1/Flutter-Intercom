@@ -1,4 +1,3 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
@@ -19,7 +18,6 @@ class SplachScreen extends StatefulWidget {
 
 class _SplachScreenState extends State<SplachScreen> {
   void initState() {
-    Firebase.initializeApp(name: 'Flutter Intercom');
     firebaseManager = FirebaseManager(context);
     firebaseManager.getBuildingName();
     super.initState();
