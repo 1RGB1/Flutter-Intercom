@@ -164,134 +164,139 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              if (!_isInfoUpdated)
-                Container(
-                  width: 500,
-                  child: Center(
-                    child: Card(
-                      margin: EdgeInsets.all(20),
-                      child: SingleChildScrollView(
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                TextFormField(
-                                  key: ValueKey('username'),
-                                  decoration: InputDecoration(
-                                    labelText: 'User Name',
-                                  ),
-                                  validator: (value) {
-                                    return Validator.validateUserName(value);
-                                  },
-                                  onSaved: (value) {
-                                    userModel.username = value;
-                                  },
-                                  onChanged: (value) {
-                                    userModel.username = value;
-                                  },
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  if (!_isInfoUpdated)
+                    Container(
+                      width: 500,
+                      child: Center(
+                        child: Card(
+                          margin: EdgeInsets.all(20),
+                          child: SingleChildScrollView(
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: Form(
+                                key: _formKey,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    TextFormField(
+                                      key: ValueKey('username'),
+                                      decoration: InputDecoration(
+                                        labelText: 'User Name',
+                                      ),
+                                      validator: (value) {
+                                        return Validator.validateUserName(value);
+                                      },
+                                      onSaved: (value) {
+                                        userModel.username = value;
+                                      },
+                                      onChanged: (value) {
+                                        userModel.username = value;
+                                      },
+                                    ),
+                                    TextFormField(
+                                      key: ValueKey('flatNumber'),
+                                      decoration: InputDecoration(
+                                        labelText: 'Flat Number',
+                                      ),
+                                      validator: (value) {
+                                        return Validator.validateFlatNumber(value);
+                                      },
+                                      onSaved: (value) {
+                                        userModel.flatNumber = value;
+                                      },
+                                      onChanged: (value) {
+                                        userModel.flatNumber = value;
+                                      },
+                                    ),
+                                    SizedBox(
+                                      height: 12,
+                                    ),
+                                    RaisedButton(
+                                      color: Theme.of(context).accentColor,
+                                      shape: Theme.of(context).buttonTheme.shape,
+                                      child: Text('Start Intercom'),
+                                      onPressed: () {
+                                        if (_checkFieldsValidation()) {
+                                          _startIntercom();
+                                        }
+                                      },
+                                    ),
+                                  ],
                                 ),
-                                TextFormField(
-                                  key: ValueKey('flatNumber'),
-                                  decoration: InputDecoration(
-                                    labelText: 'Flat Number',
-                                  ),
-                                  validator: (value) {
-                                    return Validator.validateFlatNumber(value);
-                                  },
-                                  onSaved: (value) {
-                                    userModel.flatNumber = value;
-                                  },
-                                  onChanged: (value) {
-                                    userModel.flatNumber = value;
-                                  },
-                                ),
-                                SizedBox(
-                                  height: 12,
-                                ),
-                                RaisedButton(
-                                  color: Theme.of(context).accentColor,
-                                  shape: Theme.of(context).buttonTheme.shape,
-                                  child: Text('Start Intercom'),
-                                  onPressed: () {
-                                    if (_checkFieldsValidation()) {
-                                      _startIntercom();
-                                    }
-                                  },
-                                ),
-                              ],
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-              Container(
-                margin: EdgeInsets.only(bottom: 10.0),
-                child: Text(
-                  'Building $buildingName',
-                  style: TextStyle(
-                    fontSize: (kIsWeb) ? 65 : 35,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).accentColor,
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(bottom: 10.0),
-                child: Text(
-                  'Door Control',
-                  style: TextStyle(
-                    fontSize: (kIsWeb) ? 55 : 25,
-                    color: Theme.of(context).accentColor,
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(bottom: 10.0),
-                child: Text(
-                  _openCloseButtonText,
-                  style: TextStyle(
-                    fontSize: (kIsWeb) ? 55 : 25,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).accentColor,
-                  ),
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(bottom: 20.0),
-                child: Text(
-                  (!_isDoorClosed && _time >= 1) ? '$_time' : '',
-                  style: TextStyle(
-                    fontSize: (kIsWeb) ? 45 : 15,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).accentColor,
-                  ),
-                ),
-              ),
-              RaisedButton(
-                color: _openCloseButtonColor,
-                shape: Theme.of(context).buttonTheme.shape,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Text(
-                    _openCloseButtonText,
-                    style: TextStyle(
-                      fontSize: (kIsWeb) ? 35 : 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  Container(
+                    margin: EdgeInsets.only(bottom: 10.0),
+                    child: Text(
+                      'Building $buildingName',
+                      style: TextStyle(
+                        fontSize: (kIsWeb) ? 65 : 35,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).accentColor,
+                      ),
                     ),
                   ),
-                ),
-                onPressed: _openCloseAction,
+                  Container(
+                    margin: EdgeInsets.only(bottom: 10.0),
+                    child: Text(
+                      'Door Control',
+                      style: TextStyle(
+                        fontSize: (kIsWeb) ? 55 : 25,
+                        color: Theme.of(context).accentColor,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(bottom: 10.0),
+                    child: Text(
+                      _openCloseButtonText,
+                      style: TextStyle(
+                        fontSize: (kIsWeb) ? 55 : 25,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).accentColor,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(bottom: 20.0),
+                    child: Text(
+                      (!_isDoorClosed && _time >= 1) ? '$_time' : '',
+                      style: TextStyle(
+                        fontSize: (kIsWeb) ? 45 : 15,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).accentColor,
+                      ),
+                    ),
+                  ),
+                  RaisedButton(
+                    color: _openCloseButtonColor,
+                    shape: Theme.of(context).buttonTheme.shape,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Text(
+                        _openCloseButtonText,
+                        style: TextStyle(
+                          fontSize: (kIsWeb) ? 35 : 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                    onPressed: _openCloseAction,
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),
